@@ -12,16 +12,14 @@ public class HealthGraphImpl implements HealthGraph {
     /*package*/ HealthGraphImpl(Configuration configuration) {
         Token EMPTY_TOKEN = null;
 
-        String AUTHORIZE_URL = "https://runkeeper.com/apps/authorize";
-
         // Add https proxy info here
-        System.setProperty("https.proxyHost", "your.proxy.com");
+        System.setProperty("https.proxyHost", "nokes.nokia.com");
         System.setProperty("https.proxyPort", "8080");
 
         OAuthService service = new ServiceBuilder()
                                    .provider(RunKeeperApi.class)
-                                   .apiKey("Client ID")
-                                   .apiSecret("Client Secret")
+                                   .apiKey(configuration.getClientID())
+                                   .apiSecret(configuration.getClientSecret())
                                    .callback("http://localhost:8080")
                                    .build();
         Scanner in = new Scanner(System.in);
@@ -50,7 +48,7 @@ public class HealthGraphImpl implements HealthGraph {
         System.out.println("Now we're going to access a protected resource...");
 
         OAuthRequest userRequest = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/user?oauth_token=" + accessToken.getToken());
-        userRequest.addHeader("Accept", "application/vnd.com.runkeeper.User+json");
+        userRequest.addHeader("Accept",  HealthGraph.ContentType.USER);
 
         service.signRequest(accessToken, userRequest); // the access token from step 4
         System.out.println(userRequest);
@@ -59,7 +57,7 @@ public class HealthGraphImpl implements HealthGraph {
         System.out.println(userResponse.getBody());
 
         OAuthRequest fitnessActivitiesReqest = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/fitnessActivities?oauth_token=" + accessToken.getToken());
-        fitnessActivitiesReqest.addHeader("Accept", "application/vnd.com.runkeeper.FitnessActivityFeed+json");
+        fitnessActivitiesReqest.addHeader("Accept", ContentType.FITNESS_ACTIVITY_FEED);
 
         service.signRequest(accessToken, fitnessActivitiesReqest); // the access token from step 4
         System.out.println(fitnessActivitiesReqest);

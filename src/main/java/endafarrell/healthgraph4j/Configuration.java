@@ -1,11 +1,19 @@
 package endafarrell.healthgraph4j;
 
 public interface Configuration {
-    //String getOAuthConsumerKey();
-    //String getOAuthConsumerSecret();
 
-    String getOAuthAccessToken();
+    void setClientID(String clientID);
+    String getClientID();
 
-    String getOAuthAccessTokenSecret();
+    void setClientSecret(String clientSecret);
+    String getClientSecret();
 
+    void setAuthorizationURL(String authorizationURL);
+    String getAuthorizationURL();
+
+    void setAccessTokenURL(String accessTokenURL);
+    String getAccessTokenURL();
+
+    void setDeAuthorizationURL(String deAuthorizationURL);
+    String getDeAuthorizationURL();
 }

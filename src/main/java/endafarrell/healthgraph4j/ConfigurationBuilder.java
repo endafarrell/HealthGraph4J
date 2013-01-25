@@ -19,28 +19,33 @@ public class ConfigurationBuilder {
         }
     }
 
-    public ConfigurationBuilder setOauthAccessToken(String oauthAccessToken) {
+    public ConfigurationBuilder setClientID(final String clientID) {
         checkNotBuilt();
-        configurationBean.setOauthAccessToken(oauthAccessToken);
+        configurationBean.setClientID(clientID);
         return this;
     }
 
-    public ConfigurationBuilder setOauthAccessTokenSecret(String oauthAccessTokenSecret){
+    public ConfigurationBuilder setClientSecret(final String clientSecret) {
         checkNotBuilt();
-        configurationBean.setOauthAccessTokenSecret(oauthAccessTokenSecret);
+        configurationBean.setClientSecret(clientSecret);
         return this;
     }
 
-    public ConfigurationBuilder setOauthConsumerKey(String oauthConsumerKey){
+    public ConfigurationBuilder setAuthorizationURL(final String authorizationURL) {
         checkNotBuilt();
-        configurationBean.setOauthConsumerKey(oauthConsumerKey);
+        configurationBean.setAuthorizationURL(authorizationURL);
         return this;
     }
 
-    public ConfigurationBuilder setOauthConsumerSecret(String oauthConsumerSecret) {
+    public ConfigurationBuilder setAccessTokenURL(final String accessTokenURL) {
         checkNotBuilt();
-        configurationBean.setOauthConsumerSecret(oauthConsumerSecret);
+        configurationBean.setAccessTokenURL(accessTokenURL);
         return this;
     }
 
+    public ConfigurationBuilder setDeAuthorizationURL(final String deAuthorizationURL) {
+        checkNotBuilt();
+        configurationBean.setDeAuthorizationURL(deAuthorizationURL);
+        return this;
+    }
 }

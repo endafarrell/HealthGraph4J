@@ -3,41 +3,52 @@ package endafarrell.healthgraph4j.impl;
 import endafarrell.healthgraph4j.Configuration;
 
 public class ConfigurationImpl implements Configuration {
+    String clientID;
+    String clientSecret;
+    String authorizationURL;
+    String accessTokenURL;
+    String deAuthorizationURL;
 
-    String oauthConsumerKey;
-    String oauthConsumerSecret;
-    String oauthAccessToken;
-    String oauthAccessTokenSecret;
-
-    public String getOAuthConsumerKey() {
-        return oauthConsumerKey;
+    public String getClientID() {
+        return clientID;
     }
 
-    public String getOAuthConsumerSecret() {
-        return oauthConsumerSecret;
+    public void setClientID(final String clientID) {
+        this.clientID = clientID;
     }
 
-    public String getOAuthAccessToken() {
-        return oauthAccessToken;
+    public String getClientSecret() {
+        return clientSecret;
     }
 
-    public String getOAuthAccessTokenSecret() {
-        return oauthAccessTokenSecret;
+    public void setClientSecret(final String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
-    public void setOauthConsumerKey(String oauthConsumerKey) {
-        this.oauthConsumerKey = oauthConsumerKey;
+    public String getAuthorizationURL() {
+        return authorizationURL;
     }
 
-    public void setOauthConsumerSecret(String oauthConsumerSecret) {
-        this.oauthConsumerSecret = oauthConsumerSecret;
+    public void setAuthorizationURL(final String authorizationURL) {
+        this.authorizationURL = authorizationURL;
     }
 
-    public void setOauthAccessToken(String oauthAccessToken) {
-        this.oauthAccessToken = oauthAccessToken;
+    public String getAccessTokenURL() {
+        return accessTokenURL;
     }
 
-    public void setOauthAccessTokenSecret(String oauthAccessTokenSecret) {
-        this.oauthAccessTokenSecret = oauthAccessTokenSecret;
+    public void setAccessTokenURL(final String accessTokenURL) {
+        this.accessTokenURL = accessTokenURL;
     }
+
+    public String getDeAuthorizationURL() {
+        return deAuthorizationURL;
+    }
+
+    public void setDeAuthorizationURL(final String deAuthorizationURL) {
+        this.deAuthorizationURL = deAuthorizationURL;
+    }
+
+
+
 }
