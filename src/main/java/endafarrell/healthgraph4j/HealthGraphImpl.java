@@ -13,11 +13,15 @@ public class HealthGraphImpl implements HealthGraph {
         Token EMPTY_TOKEN = null;
 
         String AUTHORIZE_URL = "https://runkeeper.com/apps/authorize";
-        //To change body of created methods use File | Settings | File Templates.
+
+        // Add https proxy info here
+        System.setProperty("https.proxyHost", "your.proxy.com");
+        System.setProperty("https.proxyPort", "8080");
+
         OAuthService service = new ServiceBuilder()
                                    .provider(RunKeeperApi.class)
-                                   .apiKey("apiKey")
-                                   .apiSecret("apiSecret")
+                                   .apiKey("Client ID")
+                                   .apiSecret("Client Secret")
                                    .callback("http://localhost:8080")
                                    .build();
         Scanner in = new Scanner(System.in);
@@ -35,7 +39,7 @@ public class HealthGraphImpl implements HealthGraph {
         Verifier verifier = new Verifier(in.nextLine());
         System.out.println();
 
-        // Trade the Request Token and Verfier for the Access Token
+        // Trade the Request Token and Verifier for the Access Token
         System.out.println("Trading the Request Token for an Access Token...");
         Token accessToken = service.getAccessToken(EMPTY_TOKEN, verifier);
         System.out.println("Got the Access Token!");
@@ -45,12 +49,23 @@ public class HealthGraphImpl implements HealthGraph {
         // Now let's go and ask for a protected resource!
         System.out.println("Now we're going to access a protected resource...");
 
-        OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/user/");
-        service.signRequest(accessToken, request); // the access token from step 4
-        System.out.println(request);
-        Response response = request.send();
-        System.out.println(response.getCode());
-        System.out.println(response.getBody());
+        OAuthRequest userRequest = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/user?oauth_token=" + accessToken.getToken());
+        userRequest.addHeader("Accept", "application/vnd.com.runkeeper.User+json");
+
+        service.signRequest(accessToken, userRequest); // the access token from step 4
+        System.out.println(userRequest);
+        Response userResponse = userRequest.send();
+        System.out.println(userResponse.getCode());
+        System.out.println(userResponse.getBody());
+
+        OAuthRequest fitnessActivitiesReqest = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/fitnessActivities?oauth_token=" + accessToken.getToken());
+        fitnessActivitiesReqest.addHeader("Accept", "application/vnd.com.runkeeper.FitnessActivityFeed+json");
+
+        service.signRequest(accessToken, fitnessActivitiesReqest); // the access token from step 4
+        System.out.println(fitnessActivitiesReqest);
+        Response fitnessActivitiesResponse = fitnessActivitiesReqest.send();
+        System.out.println(fitnessActivitiesResponse.getCode());
+        System.out.println(fitnessActivitiesResponse.getBody());
     }
 
     public String getUserID() throws HealthGraphException {
