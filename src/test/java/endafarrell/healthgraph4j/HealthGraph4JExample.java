@@ -15,7 +15,7 @@ public class HealthGraph4JExample {
             configurationBuilder.setClientSecret(properties.getString("ClientSecret"));
             configurationBuilder.setAuthorizationURL(properties.getString("AuthorizationURL"));
             configurationBuilder.setAccessTokenURL(properties.getString("AccessTokenURL"));
-            configurationBuilder.setDeAuthorizationURL(properties.getString("De-Authorization URL"));
+            configurationBuilder.setDeAuthorizationURL(properties.getString("DeAuthorizationURL"));
 
             Configuration configuration = configurationBuilder.build();
             HealthGraphFactory factory = new HealthGraphFactory(configuration);

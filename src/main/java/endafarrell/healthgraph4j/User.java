@@ -12,4 +12,6 @@ public interface User {
     String getBackgroundActivitiesResourcesPath();
     String getRecordsResourcesPath();
     String getProfileResourcesPath();
+    String getSleepResourcesPath();
+    long getUserID();
 }
