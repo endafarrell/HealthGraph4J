@@ -1,17 +1,15 @@
 package endafarrell.healthgraph4j.impl;
 
+import endafarrell.healthgraph4j.HealthGraph;
 import endafarrell.healthgraph4j.Profile;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.net.URI;
 
 
 public class ProfileImpl implements Profile {
-    DateTimeFormatter birthdayFormatter = DateTimeFormat.forPattern("EEE, d MMM YYYY HH:mm:ss");
 
     @JsonCreator
     public ProfileImpl(@JsonProperty("birthday") final String birthday,
@@ -25,7 +23,7 @@ public class ProfileImpl implements Profile {
                        @JsonProperty("medium_picture") final URI mediumPictureURI,
                        @JsonProperty("small_picture") final URI smallPictureURI,
                        @JsonProperty("large_picture") final URI largePictureURI) {
-        this.birthday = birthdayFormatter.parseDateTime(birthday);
+        this.birthday = HealthGraph.dateFormatter.parseDateTime(birthday);
         this.location = location;
         this.name = name;
         isElite = elite;
@@ -50,64 +48,53 @@ public class ProfileImpl implements Profile {
     private final URI smallPictureURI;
     private final URI largePictureURI;
 
-    @Override
     public DateTime getBirthday() {
         return birthday;
     }
 
-    @Override
     public String getLocation() {
         return location;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public boolean isElite() {
         return isElite;
     }
 
-    @Override
     public String getGender() {
         return gender;
     }
 
-    @Override
     public String getAthleteType() {
         return athleteType;
     }
 
-    @Override
     public URI getProfile() {
         return profileURI;
     }
 
-    @Override
     public URI getSmallPicture() {
         return smallPictureURI;
     }
 
-    @Override
     public URI getNormalPicture() {
         return normalPictureURI;
     }
 
-    @Override
     public URI getMediumPicture() {
         return mediumPictureURI;
     }
 
-    @Override
     public URI getLargePicture() {
         return largePictureURI;
     }
 
     @Override
     public String toString() {
-        return "ProfileImpl{" +
+        return "Profile{" +
                 "birthday=" + birthday +
                 ", location='" + location + '\'' +
                 ", name='" + name + '\'' +

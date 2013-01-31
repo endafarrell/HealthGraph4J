@@ -1,6 +1,8 @@
 package endafarrell.healthgraph4j;
 
 import endafarrell.healthgraph4j.api.*;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public interface HealthGraph extends
         UserResources,
@@ -17,6 +19,8 @@ public interface HealthGraph extends
         RecordsResources,
         ProfileResources
 {
+    DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("EEE, d MMM YYYY HH:mm:ss");
+
     long getUserID() throws HealthGraphException;
 
     class ContentType {

@@ -78,74 +78,61 @@ public class UserImpl implements User {
     private final String sleepResourcesPath;
 
 
-    @Override
     public String getStrengthTrainingActivitiesResourcesPath() {
         return strengthTrainingActivitiesResourcesPath;
     }
 
-    @Override
     public String getWeightResourcesPath() {
         return weightResourcesPath;
     }
 
-    @Override
     public String getSettingsResourcesPath() {
         return settingsResourcesPath;
     }
 
-    @Override
     public String getDiabetesResourcesPath() {
         return diabetesResourcesPath;
     }
 
-    @Override
     public String getTeamResourcesPath() {
         return teamResourcesPath;
     }
 
-    @Override
-    public String getFitnessActivitiesResourcesPath() {
+    public String getFitnessActivityItemsResourcesPath() {
         return fitnessActivitiesResourcesPath;
     }
 
-    @Override
     public String getNutritionResourcesPath() {
         return nutritionResourcesPath;
     }
 
-    @Override
     public String getGeneralMeasurementsResourcesPath() {
         return generalMeasurementsResourcesPath;
     }
 
-    @Override
     public String getBackgroundActivitiesResourcesPath() {
         return backgroundActivitiesResourcesPath;
     }
 
-    @Override
     public String getRecordsResourcesPath() {
         return recordsResourcesPath;
     }
 
-    @Override
     public String getProfileResourcesPath() {
         return profileResourcesPath;
     }
 
-    @Override
     public long getUserID() {
         return userID;
     }
 
-    @Override
     public String getSleepResourcesPath() {
         return sleepResourcesPath;
     }
 
     @Override
     public String toString() {
-        return "UserImpl{" +
+        return "User{" +
                 "strengthTrainingActivitiesResourcesPath='" + strengthTrainingActivitiesResourcesPath + '\'' +
                 ", weightResourcesPath='" + weightResourcesPath + '\'' +
                 ", settingsResourcesPath='" + settingsResourcesPath + '\'' +

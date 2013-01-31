@@ -1,5 +1,6 @@
 package endafarrell.healthgraph4j;
 
+import endafarrell.healthgraph4j.api.Feed;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -24,6 +25,9 @@ public class HealthGraph4JExample {
             try {
                 Profile profile = healthGraph.getProfile();
                 System.out.println(profile);
+                System.out.println();
+                Feed<FitnessActivityItem> fitnessActivityFeed = healthGraph.getFitnessActivityFeed();
+                System.out.println(fitnessActivityFeed);
             } catch (HealthGraphException e) {
                 e.printStackTrace();
             }

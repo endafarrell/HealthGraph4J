@@ -1,9 +1,14 @@
 package endafarrell.healthgraph4j;
 
+import endafarrell.healthgraph4j.api.Feed;
+import endafarrell.healthgraph4j.impl.FeedImpl;
+import endafarrell.healthgraph4j.impl.FitnessActivityItemImpl;
 import endafarrell.healthgraph4j.impl.ProfileImpl;
 import endafarrell.healthgraph4j.impl.UserImpl;
 import endafarrell.healthgraph4j.oauth.RunKeeperApi;
+import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.*;
 import org.scribe.oauth.OAuthService;
@@ -17,21 +22,22 @@ public class HealthGraphImpl implements HealthGraph {
     private final ObjectMapper mapper;
     private final User user;
     private Profile profile;
+    private Feed<FitnessActivityItem> fitnessActivityItems;
 
-    /*package*/ HealthGraphImpl(Configuration configuration) {
+    HealthGraphImpl(Configuration configuration) {
         Token EMPTY_TOKEN = null;
 
         // Add https proxy info here
-        System.setProperty("https.proxyHost", "nokes.nokia.com");
-        System.setProperty("https.proxyPort", "8080");
+        //System.setProperty("https.proxyHost", "nokes.nokia.com");
+        //System.setProperty("https.proxyPort", "8080");
 
         this.mapper = new ObjectMapper();
         this.authService = new ServiceBuilder()
-                                   .provider(RunKeeperApi.class)
-                                   .apiKey(configuration.getClientID())
-                                   .apiSecret(configuration.getClientSecret())
-                                   .callback("http://localhost:8080")
-                                   .build();
+                .provider(RunKeeperApi.class)
+                .apiKey(configuration.getClientID())
+                .apiSecret(configuration.getClientSecret())
+                .callback("http://localhost:8080")
+                .build();
         Scanner in = new Scanner(System.in);
         // Obtain the Authorization URL
         String authorizationUrl = authService.getAuthorizationUrl(EMPTY_TOKEN);
@@ -52,16 +58,6 @@ public class HealthGraphImpl implements HealthGraph {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-
-//        OAuthRequest fitnessActivitiesReqest = new OAuthRequest(Verb.GET, "https://api.runkeeper.com/fitnessActivities?oauth_token=" + accessToken.getToken());
-//        fitnessActivitiesReqest.addHeader("Accept", ContentType.FITNESS_ACTIVITY_FEED);
-//
-//        authService.signRequest(accessToken, fitnessActivitiesReqest); // the access token from step 4
-//        System.out.println(fitnessActivitiesReqest);
-//        Response fitnessActivitiesResponse = fitnessActivitiesReqest.send();
-//        System.out.println(fitnessActivitiesResponse.getCode());
-//        System.out.println(fitnessActivitiesResponse.getBody());
     }
 
     String readService(final String contentType, final String path) {
@@ -77,15 +73,15 @@ public class HealthGraphImpl implements HealthGraph {
     }
 
     public long getUserID() throws HealthGraphException {
-        return this.user.getUserID();
+        return user.getUserID();
     }
 
     public Profile getProfile() throws HealthGraphException {
-        if (this.profile == null) {
+        if (profile == null) {
             try {
                 String responseBody = readService(ContentType.PROFILE, this.user.getProfileResourcesPath());
                 System.out.println(responseBody);
-                this.profile = mapper.readValue(responseBody, ProfileImpl.class);
+                profile = mapper.readValue(responseBody, ProfileImpl.class);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -95,10 +91,24 @@ public class HealthGraphImpl implements HealthGraph {
     }
 
     public Profile getProfile(int userId) throws HealthGraphException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new NotImplementedException();
     }
 
     public User getUser() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return user;
+    }
+
+    public Feed<FitnessActivityItem> getFitnessActivityFeed() throws HealthGraphException {
+        if (fitnessActivityItems == null) {
+            try {
+                String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED, this.user.getFitnessActivityItemsResourcesPath());
+                System.out.println(responseBody);
+                fitnessActivityItems = mapper.readValue(responseBody, new TypeReference<FeedImpl<FitnessActivityItemImpl>>(){});
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return fitnessActivityItems;
     }
 }

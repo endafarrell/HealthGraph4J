@@ -6,7 +6,7 @@ public interface User {
     String getSettingsResourcesPath();
     String getDiabetesResourcesPath();
     String getTeamResourcesPath();
-    String getFitnessActivitiesResourcesPath();
+    String getFitnessActivityItemsResourcesPath();
     String getNutritionResourcesPath();
     String getGeneralMeasurementsResourcesPath();
     String getBackgroundActivitiesResourcesPath();
