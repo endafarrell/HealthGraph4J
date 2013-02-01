@@ -1,10 +1,7 @@
 package endafarrell.healthgraph4j;
 
 import endafarrell.healthgraph4j.api.Feed;
-import endafarrell.healthgraph4j.impl.FeedImpl;
-import endafarrell.healthgraph4j.impl.FitnessActivityItemImpl;
-import endafarrell.healthgraph4j.impl.ProfileImpl;
-import endafarrell.healthgraph4j.impl.UserImpl;
+import endafarrell.healthgraph4j.impl.*;
 import endafarrell.healthgraph4j.oauth.RunKeeperApi;
 import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -29,8 +26,8 @@ public class HealthGraphImpl implements HealthGraph {
         Token EMPTY_TOKEN = null;
 
         // Add https proxy info here
-        //System.setProperty("https.proxyHost", "nokes.nokia.com");
-        //System.setProperty("https.proxyPort", "8080");
+        System.setProperty("https.proxyHost", "nokes.nokia.com");
+        System.setProperty("https.proxyPort", "8080");
 
         this.mapper = new ObjectMapper();
         this.authService = new ServiceBuilder()

@@ -1,6 +1,7 @@
 package endafarrell.healthgraph4j.impl;
 
 import endafarrell.healthgraph4j.FitnessActivitySummary;
+import endafarrell.healthgraph4j.HealthGraph;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.joda.time.DateTime;
@@ -54,12 +55,83 @@ public class FitnessActivitySummaryImpl implements FitnessActivitySummary {
     //activity	String	The URL of the user’s public, human-readable page for this activity	N
     private final URI activity;
 
+    public URI getUri() {
+        return uri;
+    }
+
+    public long getUserID() {
+        return userID;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getSecondaryType() {
+        return secondaryType;
+    }
+
+    public String getEquipment() {
+        return equipment;
+    }
+
+    public DateTime getStartTime() {
+        return startTime;
+    }
+
+    public double getTotalDistance() {
+        return totalDistance;
+    }
+
+    public double getDuration() {
+        return duration;
+    }
+
+    public int getAverageHeartRate() {
+        return averageHeartRate;
+    }
+
+    public double getTotalCalories() {
+        return totalCalories;
+    }
+
+    public double getClimb() {
+        return climb;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public URI getActivity() {
+        return activity;
+    }
+
     @JsonCreator
     public FitnessActivitySummaryImpl(
             @JsonProperty("uri") URI uri,
             @JsonProperty("userID") long userID,
             @JsonProperty("source") String source,
-            @JsonProperty("activity") URI activity, String type, String secondaryType, String equipment, DateTime startTime, double totalDistance, double duration, int averageHeartRate, double totalCalories, double climb, String notes, boolean live) {
+            @JsonProperty("activity") URI activity,
+            @JsonProperty("type") String type,
+            @JsonProperty("secondary_type") String secondaryType,
+            @JsonProperty("equipment") String equipment,
+            @JsonProperty("start_time") String startTime,
+            @JsonProperty("total_distance") double totalDistance,
+            @JsonProperty("duration") double duration,
+            @JsonProperty("average_heart_rate") int averageHeartRate,
+            @JsonProperty("total_calories") double totalCalories,
+            @JsonProperty("climb") double climb,
+            @JsonProperty("notes") String notes,
+            @JsonProperty("is_live") boolean isLive) {
         this.uri = uri;
         this.userID = userID;
         this.source = source;
@@ -67,13 +139,13 @@ public class FitnessActivitySummaryImpl implements FitnessActivitySummary {
         this.type = type;
         this.secondaryType = secondaryType;
         this.equipment = equipment;
-        this.startTime = startTime;
+        this.startTime = HealthGraph.dateFormatter.parseDateTime(startTime);
         this.totalDistance = totalDistance;
         this.duration = duration;
         this.averageHeartRate = averageHeartRate;
         this.totalCalories = totalCalories;
         this.climb = climb;
         this.notes = notes;
-        this.isLive = live;
+        this.isLive = isLive;
     }
 }
