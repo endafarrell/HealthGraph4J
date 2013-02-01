@@ -10,4 +10,6 @@ public interface FitnessActivitiesResources {
     Feed<FitnessActivityItem> getFitnessActivityFeed() throws HealthGraphException;
 
     FitnessActivitySummary getFitnessActivitySummary(FitnessActivityItem fitnessActivityItem);
+
+    FitnessActivity getFitnessActivity(FitnessActivityItem fitnessActivityItem);
 }

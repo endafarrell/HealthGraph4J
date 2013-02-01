@@ -26,8 +26,8 @@ public class HealthGraphImpl implements HealthGraph {
         Token EMPTY_TOKEN = null;
 
         // Add https proxy info here
-        System.setProperty("https.proxyHost", "nokes.nokia.com");
-        System.setProperty("https.proxyPort", "8080");
+        //System.setProperty("https.proxyHost", "nokes.nokia.com");
+        //System.setProperty("https.proxyPort", "8080");
 
         this.mapper = new ObjectMapper();
         this.authService = new ServiceBuilder()
@@ -73,10 +73,6 @@ public class HealthGraphImpl implements HealthGraph {
         return readService(contentType, uri.toString());
     }
 
-    public long getUserID() throws HealthGraphException {
-        return user.getUserID();
-    }
-
     public Profile getProfile() throws HealthGraphException {
         if (profile == null) {
             try {
@@ -120,6 +116,21 @@ public class HealthGraphImpl implements HealthGraph {
             System.out.println(responseBody);
             FitnessActivitySummary fitnessActivitySummary = mapper.readValue(responseBody, FitnessActivitySummaryImpl.class);
             return fitnessActivitySummary;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public FitnessActivity getFitnessActivity(FitnessActivityItem fitnessActivityItem) {
+        // TODO - these can/should be cached, but it may make more sense to do this in the calling/using application
+        // TODO - rather than in this library as one suspects the calling/using application will have some form of
+        // TODO - database with the older ones.
+        try {
+            String responseBody = readService(ContentType.FITNESS_ACTIVITY, fitnessActivityItem.getURI());
+            System.out.println(responseBody);
+            FitnessActivity fitnessActivity = mapper.readValue(responseBody, FitnessActivityImpl.class);
+            return fitnessActivity;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

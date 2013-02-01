@@ -30,8 +30,16 @@ public class HealthGraph4JExample {
                 System.out.println(fitnessActivityFeed);
                 System.out.println();
 
-                FitnessActivitySummary fitnessActivitySummary = healthGraph.getFitnessActivitySummary(fitnessActivityFeed.getItems().get(0));
-                System.out.println(fitnessActivitySummary);
+                for (FitnessActivityItem fitnessActivityItem : fitnessActivityFeed.getItems()) {
+                    FitnessActivitySummary fitnessActivitySummary = healthGraph.getFitnessActivitySummary(fitnessActivityItem);
+                    System.out.println(fitnessActivitySummary);
+                }
+                System.out.println();
+
+                for (FitnessActivityItem fitnessActivityItem : fitnessActivityFeed.getItems()) {
+                    FitnessActivity fitnessActivity = healthGraph.getFitnessActivity(fitnessActivityItem);
+                    System.out.println(fitnessActivity);
+                }
             } catch (HealthGraphException e) {
                 e.printStackTrace();
             }

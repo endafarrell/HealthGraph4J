@@ -21,13 +21,12 @@ public interface HealthGraph extends
 {
     DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("EEE, d MMM YYYY HH:mm:ss");
 
-    long getUserID() throws HealthGraphException;
-
     class ContentType {
         public static final String USER = "application/vnd.com.runkeeper.User+json";
         public static final String PROFILE = "application/vnd.com.runkeeper.Profile+json";
         public static final String FITNESS_ACTIVITY_FEED = "application/vnd.com.runkeeper.FitnessActivityFeed+json";
         public static final String FITNESS_ACTIVITY_SUMMARY = "application/vnd.com.runkeeper.FitnessActivitySummary+json";
+        public static final String FITNESS_ACTIVITY = "application/vnd.com.runkeeper.FitnessActivity+json";
 
     }
 
