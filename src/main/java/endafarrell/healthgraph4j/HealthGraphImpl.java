@@ -14,6 +14,7 @@ import org.scribe.model.*;
 import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Scanner;
 
 public class HealthGraphImpl implements HealthGraph {
@@ -71,6 +72,9 @@ public class HealthGraphImpl implements HealthGraph {
         Response userResponse = userRequest.send();
         return userResponse.getBody();
     }
+    private String readService(String contentType, URI uri) {
+        return readService(contentType, uri.toString());
+    }
 
     public long getUserID() throws HealthGraphException {
         return user.getUserID();
@@ -80,7 +84,6 @@ public class HealthGraphImpl implements HealthGraph {
         if (profile == null) {
             try {
                 String responseBody = readService(ContentType.PROFILE, this.user.getProfileResourcesPath());
-                System.out.println(responseBody);
                 profile = mapper.readValue(responseBody, ProfileImpl.class);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -102,7 +105,6 @@ public class HealthGraphImpl implements HealthGraph {
         if (fitnessActivityItems == null) {
             try {
                 String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED, this.user.getFitnessActivityItemsResourcesPath());
-                System.out.println(responseBody);
                 fitnessActivityItems = mapper.readValue(responseBody, new TypeReference<FeedImpl<FitnessActivityItemImpl>>(){});
             } catch (IOException e) {
                 e.printStackTrace();
@@ -111,4 +113,21 @@ public class HealthGraphImpl implements HealthGraph {
         }
         return fitnessActivityItems;
     }
+
+    public FitnessActivitySummary getFitnessActivitySummary(FitnessActivityItem fitnessActivityItem) {
+        // TODO - these can/should be cached, but it may make more sense to do this in the calling/using application
+        // TODO - rather than in this library as one suspects the calling/using application will have some form of
+        // TODO - database with the older ones.
+        try {
+            String responseBody = readService(ContentType.FITNESS_ACTIVITY_SUMMARY, fitnessActivityItem.getURI());
+            System.out.println(responseBody);
+            FitnessActivitySummary fitnessActivitySummary = mapper.readValue(responseBody, FitnessActivitySummaryImpl.class);
+            return fitnessActivitySummary;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
