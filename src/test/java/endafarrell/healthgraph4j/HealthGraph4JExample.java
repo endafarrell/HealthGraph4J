@@ -31,6 +31,7 @@ public class HealthGraph4JExample {
                 System.out.println();
 
                 FitnessActivitySummary fitnessActivitySummary = healthGraph.getFitnessActivitySummary(fitnessActivityFeed.getItems().get(0));
+                System.out.println(fitnessActivitySummary);
             } catch (HealthGraphException e) {
                 e.printStackTrace();
             }

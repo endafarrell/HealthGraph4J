@@ -148,4 +148,25 @@ public class FitnessActivitySummaryImpl implements FitnessActivitySummary {
         this.notes = notes;
         this.isLive = isLive;
     }
+
+    @Override
+    public String toString() {
+        return "FitnessActivitySummary{" +
+                "uri=" + uri +
+                ", userID=" + userID +
+                ", type='" + type + '\'' +
+                ", secondaryType='" + secondaryType + '\'' +
+                ", equipment='" + equipment + '\'' +
+                ", startTime=" + startTime +
+                ", totalDistance=" + totalDistance +
+                ", duration=" + duration +
+                ", averageHeartRate=" + averageHeartRate +
+                ", totalCalories=" + totalCalories +
+                ", climb=" + climb +
+                ", notes='" + notes + '\'' +
+                ", isLive=" + isLive +
+                ", source='" + source + '\'' +
+                ", activity=" + activity +
+                '}';
+    }
 }
