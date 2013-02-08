@@ -12,6 +12,8 @@ import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class HealthGraphImpl implements HealthGraph {
@@ -19,15 +21,17 @@ public class HealthGraphImpl implements HealthGraph {
     private final OAuthService authService;
     private final ObjectMapper mapper;
     private final User user;
+    private final List<FitnessActivityItem> fitnessActivityItemList;
     private Profile profile;
     private Feed<FitnessActivityItem> fitnessActivityItems;
 
-    HealthGraphImpl(Configuration configuration) {
+
+    HealthGraphImpl(Configuration configuration) throws HealthGraphException {
         Token EMPTY_TOKEN = null;
 
         // Add https proxy info here
-        //System.setProperty("https.proxyHost", "nokes.nokia.com");
-        //System.setProperty("https.proxyPort", "8080");
+        System.setProperty("https.proxyHost", "nokes.nokia.com");
+        System.setProperty("https.proxyPort", "8080");
 
         this.mapper = new ObjectMapper();
         this.authService = new ServiceBuilder()
@@ -53,23 +57,28 @@ public class HealthGraphImpl implements HealthGraph {
             String responseBody = readService(ContentType.USER, USER_RESOURCES_PATH);
             this.user = mapper.readValue(responseBody, UserImpl.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new HealthGraphException(e);
         }
+        this.fitnessActivityItemList = new ArrayList<FitnessActivityItem>(100);
     }
 
-    String readService(final String contentType, final String path) {
+    String readService(final String contentType, final String path) throws HealthGraphException {
         String serviceRoot = "https://api.runkeeper.com";
 
         OAuthRequest userRequest = new OAuthRequest(
                 Verb.GET,
-                serviceRoot + path + "?oauth_token=" + accessToken.getToken());
+                serviceRoot + path);
         userRequest.addHeader("Accept", contentType);
         authService.signRequest(accessToken, userRequest);
         Response userResponse = userRequest.send();
-        return userResponse.getBody();
+        if (userResponse.isSuccessful()) {
+            return userResponse.getBody();
+        }
+        throw new HealthGraphException(userRequest.toString() + " failed with response code" + userResponse.getCode()
+                                               + " and returned the followin content:\n" + userResponse.getBody());
     }
-    private String readService(String contentType, URI uri) {
+
+    private String readService(String contentType, URI uri) throws HealthGraphException {
         return readService(contentType, uri.toString());
     }
 
@@ -79,8 +88,7 @@ public class HealthGraphImpl implements HealthGraph {
                 String responseBody = readService(ContentType.PROFILE, this.user.getProfileResourcesPath());
                 profile = mapper.readValue(responseBody, ProfileImpl.class);
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
+                throw new HealthGraphException(e);
             }
         }
         return profile;
@@ -95,46 +103,68 @@ public class HealthGraphImpl implements HealthGraph {
     }
 
     public Feed<FitnessActivityItem> getFitnessActivityFeed() throws HealthGraphException {
-        if (fitnessActivityItems == null) {
-            try {
-                String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED, this.user.getFitnessActivityItemsResourcesPath());
-                fitnessActivityItems = mapper.readValue(responseBody, new TypeReference<FeedImpl<FitnessActivityItemImpl>>(){});
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        }
-        return fitnessActivityItems;
+        return getFitnessActivityFeed(null);
     }
 
-    public FitnessActivitySummary getFitnessActivitySummary(FitnessActivityItem fitnessActivityItem) {
+    @Override
+    public Feed<FitnessActivityItem> getFitnessActivityFeed(final URI next) throws HealthGraphException {
+        if (fitnessActivityItems == null) {
+            try {
+                String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED,
+                                                  this.user.getFitnessActivityItemsResourcesPath());
+                fitnessActivityItems
+                        = mapper.readValue(responseBody, new TypeReference<FeedImpl <FitnessActivityItemImpl>>() { });
+                this.fitnessActivityItemList.addAll(fitnessActivityItems.getItems());
+                return fitnessActivityItems;
+            } catch (IOException e) {
+                throw new HealthGraphException(e);
+            }
+        } else {
+            try {
+                String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED, next);
+                Feed<FitnessActivityItem> nextFitnessActivityItems
+                        = mapper.readValue(responseBody, new TypeReference<FeedImpl<FitnessActivityItemImpl>>() { });
+                fitnessActivityItemList.addAll(nextFitnessActivityItems.getItems());
+                return nextFitnessActivityItems;
+            } catch (IOException e) {
+                throw new HealthGraphException(e);
+            }
+        }
+
+    }
+
+    @Override
+    public List<FitnessActivityItem> getFitnessActivityFeed(final boolean getAllFeedPages) throws HealthGraphException {
+        throw new NotImplementedException();
+    }
+
+    public FitnessActivitySummary getFitnessActivitySummary(FitnessActivityItem fitnessActivityItem) throws HealthGraphException {
         // TODO - these can/should be cached, but it may make more sense to do this in the calling/using application
         // TODO - rather than in this library as one suspects the calling/using application will have some form of
         // TODO - database with the older ones.
         try {
             String responseBody = readService(ContentType.FITNESS_ACTIVITY_SUMMARY, fitnessActivityItem.getURI());
-            System.out.println(responseBody);
-            FitnessActivitySummary fitnessActivitySummary = mapper.readValue(responseBody, FitnessActivitySummaryImpl.class);
-            return fitnessActivitySummary;
+            return mapper.readValue(responseBody, FitnessActivitySummaryImpl.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new HealthGraphException(e);
         }
     }
 
-    public FitnessActivity getFitnessActivity(FitnessActivityItem fitnessActivityItem) {
+    public FitnessActivity getFitnessActivity(FitnessActivityItem fitnessActivityItem) throws HealthGraphException {
         // TODO - these can/should be cached, but it may make more sense to do this in the calling/using application
         // TODO - rather than in this library as one suspects the calling/using application will have some form of
         // TODO - database with the older ones.
         try {
             String responseBody = readService(ContentType.FITNESS_ACTIVITY, fitnessActivityItem.getURI());
-            System.out.println(responseBody);
-            FitnessActivity fitnessActivity = mapper.readValue(responseBody, FitnessActivityImpl.class);
-            return fitnessActivity;
+            return mapper.readValue(responseBody, FitnessActivityImpl.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new HealthGraphException(e);
         }
+    }
+
+    @Override
+    public List<FitnessActivityItem> getFitnessActivityItemList() {
+        return fitnessActivityItemList;
     }
 
 
