@@ -5,22 +5,20 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class FeedImpl<T> implements Feed<T> {
     private final int size;
-    private final URI previous;
-    private final URI next;
+    private final String previous;
+    private final String next;
     private final ArrayList<T> items;
 
     @JsonCreator
     public FeedImpl(@JsonProperty("size") int size,
-                    @JsonProperty("previous") URI previous,
-                    @JsonProperty("next") URI next,
+                    @JsonProperty("previous") String previous,
+                    @JsonProperty("next") String next,
                     @JsonProperty("items") ArrayList<T> items) {
         this.size = size;
         this.previous = previous;
@@ -32,11 +30,11 @@ public class FeedImpl<T> implements Feed<T> {
         return size;
     }
 
-    public URI getPrevious() {
+    public String getPrevious() {
         return previous;
     }
 
-    public URI getNext() {
+    public String getNext() {
         return next;
     }
 
