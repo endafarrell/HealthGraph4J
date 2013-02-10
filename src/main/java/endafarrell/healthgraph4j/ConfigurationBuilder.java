@@ -48,4 +48,22 @@ public class ConfigurationBuilder {
         configurationBean.setDeAuthorizationURL(deAuthorizationURL);
         return this;
     }
+
+    public ConfigurationBuilder setCallbackURL(String callbackURL) {
+        checkNotBuilt();
+        configurationBean.setCallbackURL(callbackURL);
+        return this;
+    }
+
+    public ConfigurationBuilder setHttpsProxyHost(String httpsProxyHost) {
+        checkNotBuilt();
+        configurationBean.setHttpsProxyHost(httpsProxyHost);
+        return this;
+    }
+
+    public ConfigurationBuilder setHttpsProxyPort(String httpsProxyPort) {
+        checkNotBuilt();
+        configurationBean.setHttpsProxyPort(httpsProxyPort);
+        return this;
+    }
 }

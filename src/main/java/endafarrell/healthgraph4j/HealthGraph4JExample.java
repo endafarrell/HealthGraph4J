@@ -4,9 +4,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.Interval;
 import org.joda.time.Period;
-import org.joda.time.field.MillisDurationField;
 import org.joda.time.format.PeriodFormat;
 
 public class HealthGraph4JExample {
@@ -22,12 +20,19 @@ public class HealthGraph4JExample {
         configurationBuilder.setAuthorizationURL(properties.getString("AuthorizationURL"));
         configurationBuilder.setAccessTokenURL(properties.getString("AccessTokenURL"));
         configurationBuilder.setDeAuthorizationURL(properties.getString("DeAuthorizationURL"));
+        configurationBuilder.setCallbackURL("http://localhost:8080");
+        configurationBuilder.setHttpsProxyHost(properties.getString("https.proxyHost"));
+        configurationBuilder.setHttpsProxyPort(properties.getString("https.proxyPort"));
 
         Configuration configuration = configurationBuilder.build();
 
         // With the configuration, create a factory and then a new HealthGraph
         HealthGraphFactory factory = new HealthGraphFactory(configuration);
         HealthGraph healthGraph = factory.getInstance();
+
+        // The first step is authorisation. In this case we use the Cmdline Interactive one (which doesn't really
+        // return anything):
+        healthGraph.authenticate(HealthGraph.AuthorisationMethod.CmdlineInteractive);
 
         // Get your profile
         Profile profile = healthGraph.getProfile();
@@ -37,14 +42,14 @@ public class HealthGraph4JExample {
         int num = 1;
         // iterate over all of your fitness activities (the "true" gets all activities, not just the first page)
         for (FitnessActivityItem fitnessActivityItem : healthGraph.getFitnessActivityList(true)) {
-            //System.out.println(String.format("%2d %s", num++, healthGraph.getFitnessActivity(fitnessActivityItem)));
+            System.out.println(String.format("%2d %s", num++, healthGraph.getFitnessActivity(fitnessActivityItem)));
         }
 
         System.out.println();
         num = 1;
         // Now that we have _all_ of the activities, you can also iterate over the summaries
         for (FitnessActivityItem fitnessActivityItem : healthGraph.getFitnessActivityList()) {
-            //System.out.println(String.format("%2d %s", num++, healthGraph.getFitnessActivitySummary(fitnessActivityItem)));
+            System.out.println(String.format("%2d %s", num++, healthGraph.getFitnessActivitySummary(fitnessActivityItem)));
         }
 
         System.out.println();

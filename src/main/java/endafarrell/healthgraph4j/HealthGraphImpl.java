@@ -22,54 +22,60 @@ public class HealthGraphImpl implements HealthGraph {
 
 
     private transient Token accessToken;
+    private transient boolean isAuthorised;
     private final OAuthService authService;
     private final ObjectMapper mapper;
-    private final User user;
+    private User user;
     private final HealthGraphList<FitnessActivityItem> fitnessActivityItemList;
     private Profile profile;
 
-
-
     HealthGraphImpl(Configuration configuration) throws HealthGraphException {
-        Token EMPTY_TOKEN = null;
-
-        // Add https proxy info here
-        //System.setProperty("https.proxyHost", "nokes.nokia.com");
-        //System.setProperty("https.proxyPort", "8080");
+        if (configuration.hasHttpsProxyInfo()) {
+            System.setProperty("https.proxyHost", configuration.getHttpsProxyHost());
+            System.setProperty("https.proxyPort", configuration.getHttpsProxyPort());
+        }
 
         this.mapper = new ObjectMapper();
         this.authService = new ServiceBuilder()
                 .provider(RunKeeperApi.class)
                 .apiKey(configuration.getClientID())
                 .apiSecret(configuration.getClientSecret())
-                .callback("http://localhost:8080")
+                .callback(configuration.getCallbackURL())
                 .build();
-        Scanner in = new Scanner(System.in);
-        // Obtain the Authorization URL
-        String authorizationUrl = authService.getAuthorizationUrl(EMPTY_TOKEN);
-        System.out.println("Now go and authorize Scribe here:");
-        System.out.println(authorizationUrl);
-        System.out.println("And paste the authorization code here");
-        System.out.print(">>");
-        Verifier verifier = new Verifier(in.nextLine());
-        System.out.println();
+        this.fitnessActivityItemList = new HealthGraphListImpl<FitnessActivityItem>(100);
+        isAuthorised = false;
+    }
+
+    public String authenticate(AuthorisationMethod authorisationMethod) throws HealthGraphException {
+        switch (authorisationMethod) {
+            case CmdlineInteractive:
+                authoriseCmdlineInteractive();
+                return null;
+            case OAuthCallback:
+                return authoriseOAuthCallback();
+            default:
+                throw new HealthGraphException(new NotImplementedException("The authorisation method "
+                        + authorisationMethod + " is not supported."));
+        }
+    }
+
+    public void authenticate(String authenticationCode) throws HealthGraphException {
+        Token EMPTY_TOKEN = null;
+        Verifier verifier = new Verifier(authenticationCode);
+
 
         // Trade the Request Token and Verifier for the Access Token
         this.accessToken = authService.getAccessToken(EMPTY_TOKEN, verifier);
 
         try {
+            this.isAuthorised = true;
             String responseBody = readService(ContentType.USER, USER_RESOURCES_PATH);
             this.user = mapper.readValue(responseBody, UserImpl.class);
+            System.out.println("Success - you are authorised with user ID " + user.getUserID());
+
         } catch (IOException e) {
             throw new HealthGraphException(e);
         }
-        this.fitnessActivityItemList = new HealthGraphListImpl<FitnessActivityItem>(100);
-    }
-
-
-
-    private String readService(String contentType, URI uri) throws HealthGraphException {
-        return readService(contentType, uri.toString());
     }
 
     public Profile getProfile() throws HealthGraphException {
@@ -142,9 +148,41 @@ public class HealthGraphImpl implements HealthGraph {
     //\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     ////////////////////////////////////////////////////////////////////////////////////////////
 
+    void authoriseCmdlineInteractive() throws HealthGraphException {
+        Token EMPTY_TOKEN = null;
+        Scanner in = new Scanner(System.in);
+        // Obtain the Authorization URL
+        String authorizationUrl = authService.getAuthorizationUrl(EMPTY_TOKEN);
+        System.out.println("First log onto runkeeper.com, and then go to this URL to authorize HealthGraph4J:");
+        System.out.println(authorizationUrl);
+        System.out.println("Now paste the (authorization) code here");
+        System.out.print(">> ");
+        Verifier verifier = new Verifier(in.nextLine());
+        System.out.println();
 
+        // Trade the Request Token and Verifier for the Access Token
+        this.accessToken = authService.getAccessToken(EMPTY_TOKEN, verifier);
+
+        try {
+            this.isAuthorised = true;
+            String responseBody = readService(ContentType.USER, USER_RESOURCES_PATH);
+            this.user = mapper.readValue(responseBody, UserImpl.class);
+            System.out.println("Success - you are authorised with user ID " + user.getUserID());
+
+        } catch (IOException e) {
+            throw new HealthGraphException(e);
+        }
+    }
+
+    private String authoriseOAuthCallback() {
+        Token EMPTY_TOKEN = null;
+        return authService.getAuthorizationUrl(EMPTY_TOKEN);
+    }
 
     String readService(final String contentType, final String path) throws HealthGraphException {
+        if (!isAuthorised) {
+            throw new HealthGraphException("You are not authorised - please call authorisation first");
+        }
         String serviceRoot = "https://api.runkeeper.com";
 
         OAuthRequest userRequest = new OAuthRequest(
@@ -157,7 +195,11 @@ public class HealthGraphImpl implements HealthGraph {
             return userResponse.getBody();
         }
         throw new HealthGraphException(userRequest.toString() + " failed with response code" + userResponse.getCode()
-                                               + " and returned the following content:\n" + userResponse.getBody());
+                + " and returned the following content:\n" + userResponse.getBody());
+    }
+
+    String readService(String contentType, URI uri) throws HealthGraphException {
+        return readService(contentType, uri.toString());
     }
 
     HealthGraphList<FitnessActivityItem> getFitnessActivityListImpl(int count) throws HealthGraphException {
@@ -180,7 +222,8 @@ public class HealthGraphImpl implements HealthGraph {
         do {
             String responseBody = readService(ContentType.FITNESS_ACTIVITY_FEED, page);
             Feed<FitnessActivityItem> fitnessActivityItemsFeed =
-                    jsonToObject(responseBody, new TypeReference<FeedImpl <FitnessActivityItemImpl>>() { });
+                    jsonToObject(responseBody, new TypeReference<FeedImpl<FitnessActivityItemImpl>>() {
+                    });
             this.fitnessActivityItemList.addAll(fitnessActivityItemsFeed.getItems());
             this.fitnessActivityItemList.setHealthGraphSize(fitnessActivityItemsFeed.getSize());
             page = fitnessActivityItemsFeed.getNext();
@@ -193,7 +236,7 @@ public class HealthGraphImpl implements HealthGraph {
             if (fitnessActivityItemsFeed.getNext() == null) {
                 done = true;
             }
-        } while (! done);
+        } while (!done);
 
         // Send back what was asked for.
         if (count == FEED_ALL) {
@@ -211,7 +254,8 @@ public class HealthGraphImpl implements HealthGraph {
             return mapper.readValue(json, valueTypeRef);
         } catch (IOException e) {
             throw new HealthGraphException("While converting the following line this exception occurred\n"
-                + json, e);
+                    + json, e);
         }
     }
+
 }

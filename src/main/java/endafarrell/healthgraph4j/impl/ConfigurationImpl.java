@@ -8,6 +8,9 @@ public class ConfigurationImpl implements Configuration {
     String authorizationURL;
     String accessTokenURL;
     String deAuthorizationURL;
+    String httpsProxyHost;
+    String httpsProxyPort;
+    String callbackURL;
 
     public String getClientID() {
         return clientID;
@@ -45,10 +48,35 @@ public class ConfigurationImpl implements Configuration {
         return deAuthorizationURL;
     }
 
+    public void setHttpsProxyHost(String httpsProxyHost) {
+        this.httpsProxyHost = httpsProxyHost;
+    }
+
     public void setDeAuthorizationURL(final String deAuthorizationURL) {
         this.deAuthorizationURL = deAuthorizationURL;
     }
 
+    public String getHttpsProxyHost() {
+        return httpsProxyHost;
+    }
 
+    public void setHttpsProxyPort(String httpsProxyPort) {
+        this.httpsProxyPort = httpsProxyPort;
+    }
 
+    public String getHttpsProxyPort() {
+        return httpsProxyPort;
+    }
+
+    public boolean hasHttpsProxyInfo() {
+        return (httpsProxyHost != null && httpsProxyPort != null);
+    }
+
+    public void setCallbackURL(String callbackURL) {
+        this.callbackURL = callbackURL;
+    }
+
+    public String getCallbackURL() {
+        return callbackURL;
+    }
 }

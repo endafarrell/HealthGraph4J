@@ -21,6 +21,9 @@ public interface HealthGraph extends
 {
     DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("EEE, d MMM YYYY HH:mm:ss");
 
+    String authenticate(AuthorisationMethod authorisationMethod) throws HealthGraphException;
+    void authenticate(String authenticationCode) throws HealthGraphException;
+
     class ContentType {
         public static final String USER = "application/vnd.com.runkeeper.User+json";
         public static final String PROFILE = "application/vnd.com.runkeeper.Profile+json";
@@ -31,4 +34,8 @@ public interface HealthGraph extends
     }
 
 
+    public enum AuthorisationMethod {
+        CmdlineInteractive,
+        OAuthCallback
+    }
 }

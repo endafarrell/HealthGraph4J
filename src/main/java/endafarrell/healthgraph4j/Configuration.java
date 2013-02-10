@@ -16,4 +16,15 @@ public interface Configuration {
 
     void setDeAuthorizationURL(String deAuthorizationURL);
     String getDeAuthorizationURL();
+
+    void setHttpsProxyHost(String httpsProxyHost);
+    String getHttpsProxyHost();
+
+    void setHttpsProxyPort(String httpsProxyPort);
+    String getHttpsProxyPort();
+
+    boolean hasHttpsProxyInfo();
+
+    void setCallbackURL(String callbackURL);
+    String getCallbackURL();
 }
