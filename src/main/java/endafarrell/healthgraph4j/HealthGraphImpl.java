@@ -5,6 +5,7 @@ import endafarrell.healthgraph4j.api.HealthGraphList;
 import endafarrell.healthgraph4j.impl.*;
 import endafarrell.healthgraph4j.oauth.RunKeeperApi;
 import org.apache.commons.lang.NotImplementedException;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.scribe.builder.ServiceBuilder;
@@ -13,7 +14,6 @@ import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
 import java.net.URI;
-
 import java.util.Scanner;
 
 public class HealthGraphImpl implements HealthGraph {
@@ -36,6 +36,7 @@ public class HealthGraphImpl implements HealthGraph {
         }
 
         this.mapper = new ObjectMapper();
+        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.authService = new ServiceBuilder()
                 .provider(RunKeeperApi.class)
                 .apiKey(configuration.getClientID())
